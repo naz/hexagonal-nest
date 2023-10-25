@@ -4,5 +4,6 @@ export class User {
     public email: string,
     public name: string,
     public age: number,
+    public roles: string[] = [],
   ) {}
 }

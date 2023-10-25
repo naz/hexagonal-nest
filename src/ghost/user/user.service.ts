@@ -1,5 +1,6 @@
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/user.dto';
 import { IUserRepository } from './user.repository';
 import ObjectID from 'bson-objectid';
 import { User } from './entities/user.entity';
@@ -19,18 +20,20 @@ export class UserService {
       createUserDto.age,
     );
     await this.repository.save(user);
-    return user;
+
+    const userDto = new UserDto(user);
+    return userDto;
   }
 
   async findAll() {
-    return `This action returns all user`;
+    return this.repository.findAll();
   }
 
   async findOne(id: number) {
     return `This action returns a #${id} user`;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number) {
     return `This action updates a #${id} user`;
   }
 
