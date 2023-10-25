@@ -13,12 +13,14 @@ export class UserRepositoryImpl implements IUserRepository {
     return [...this.idMap.values()];
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string): Promise<User | undefined> {
     return this.idMap.get(id);
   }
 
-  async findByEmail(email: string): Promise<User> {
-    return this.findById(this.emailMap.get(email));
+  async findByEmail(email: string): Promise<User | undefined> {
+    const id = this.emailMap.get(email);
+    if (!id) return undefined;
+    return this.findById(id);
   }
 
   async save(user: User): Promise<void> {
