@@ -1,32 +1,56 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Patch, Param, Delete } from '@nestjs/common';
+import { TsRestHandler, tsRestHandler } from '@ts-rest/nest';
+import { contract as c } from './contract';
 import { UserService } from '../../ghost/user/user.service';
-import { CreateUserDto } from '../../ghost/user/dto/create-user.dto';
-import { UpdateUserDto } from '../../ghost/user/dto/update-user.dto';
+import { UserDto } from '../../ghost/user/dto/user.dto';
+import { PaginatedDto } from './paginated.dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {
     this.userService = userService;
-    console.log('UserController constructor');
-    console.log(this.userService);
   }
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @TsRestHandler(c)
+  async handler() {
+    return tsRestHandler(c, {
+      createUser: async ({ body }) => {
+        const userDto = await this.userService.create(body);
+
+        return {
+          status: 201,
+          body: userDto,
+        };
+      },
+      getUsers: async ({}) => {
+        const users = await this.userService.findAll();
+        const mappedUsers = users.map((user) => new UserDto(user));
+        const paginated = new PaginatedDto<UserDto>();
+        paginated.total = mappedUsers.length;
+        paginated.results = mappedUsers;
+
+        return {
+          status: 200,
+          body: {
+            users: mappedUsers,
+            meta: {
+              total: paginated.total,
+            },
+          },
+        };
+      },
+    });
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @TsRestHandler(c.getUsers)
+  async findAll(): Promise<PaginatedDto<UserDto>> {
+    const users = await this.userService.findAll();
+    const mappedUsers = users.map((user) => new UserDto(user));
+    const paginated = new PaginatedDto<UserDto>();
+    paginated.total = mappedUsers.length;
+    paginated.results = mappedUsers;
+
+    return paginated;
   }
 
   @Get(':id')
@@ -35,8 +59,8 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(@Param('id') id: string) {
+    return this.userService.update(+id);
   }
 
   @Delete(':id')
