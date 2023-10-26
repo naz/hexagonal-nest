@@ -1,5 +1,4 @@
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { IUserRepository } from './user.repository';
 import ObjectID from 'bson-objectid';

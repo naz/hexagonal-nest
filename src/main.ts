@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { generateOpenApi } from '@ts-rest/open-api';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { contract as userAPIContract } from './http/controllers/contract';
+import { contract as userAPIContract } from './http/controllers/user.contract';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
